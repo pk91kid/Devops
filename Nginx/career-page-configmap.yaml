@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: career-page-config
+data:
+  career-page.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Career Page - DevOps Engineer</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+            }
+            header {
+                background-color: #333;
+                color: #fff;
+                padding: 10px 0;
+                text-align: center;
+            }
+            main {
+                padding: 20px;
+                text-align: center;
+            }
+            h1 {
+                color: #333;
+            }
+            .content {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                max-width: 600px;
+                margin: 0 auto;
+                text-align: left;
+            }
+            footer {
+                background-color: #333;
+                color: #fff;
+                padding: 10px 0;
+                text-align: center;
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Welcome to My Career Page</h1>
+        </header>
+        <main>
+            <div class="content">
+                <h2>Hi, I'm Anoop PK</h2>
+                <p>I am a passionate and skilled DevOps Engineer with experience in automating and optimizing complex systems. I specialize in containerization, cloud computing, CI/CD pipelines, infrastructure as code, and much more.</p>
+                <p>I'm always looking for opportunities to learn and grow in the DevOps field. Below is my GitHub profile where you can find some of my personal projects, contributions, and open-source work.</p>
+                <p>Feel free to check out my GitHub: <a href="https://github.com/pk91kid/Devops" target="_blank">https://github.com/pk91kid/Devops</a></p>
+            </div>
+        </main>
+        <footer>
+            <p>&copy; 2025 [Your Name] - DevOps Engineer</p>
+        </footer>
+    </body>
+    </html>
+

@@ -1,24 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  creationTimestamp: null
-  labels:
-    app: app1
   name: app1
 spec:
-  replicas: 3 
+  replicas: 3
   selector:
     matchLabels:
       app: app1
-  strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: app1
     spec:
       containers:
-      - image: nginx
-        name: nginx
-        resources: {}
-status: {}
+        - name: nginx
+          image: nginx
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: career-page-volume
+              mountPath: /usr/share/nginx/html/index.html
+              subPath: career-page.html
+      volumes:
+        - name: career-page-volume
+          configMap:
+            name: career-page-config
+
