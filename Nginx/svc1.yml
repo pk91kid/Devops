@@ -37,14 +37,14 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"creationTimestamp":"2025-03-03T07:33:24Z","labels":{"app":"app1","app.kubernetes.io/instance":"nginx"},"name":"svc1","namespace":"default","resourceVersion":"16910","uid":"a4cd0eef-50b5-4ffe-9724-4e40e7524a46"},"spec":{"clusterIP":"10.43.233.251","clusterIPs":["10.43.233.251"],"externalTrafficPolicy":"Cluster","internalTrafficPolicy":"Cluster","ipFamilies":["IPv4"],"ipFamilyPolicy":"SingleStack","ports":[{"nodePort":31612,"port":80,"protocol":"TCP","targetPort":80}],"selector":{"app":"app1"},"sessionAffinity":"None","type":"NodePort"},"status":{"loadBalancer":{}}}
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"creationTimestamp":"2025-03-03T07:33:24Z","labels":{"app":"app1","app.kubernetes.io/instance":"nginx"},"name":"svc1","namespace":"default","resourceVersion":"23499","uid":"a4cd0eef-50b5-4ffe-9724-4e40e7524a46"},"spec":{"clusterIP":"10.43.233.251","clusterIPs":["10.43.233.251"],"externalTrafficPolicy":"Cluster","internalTrafficPolicy":"Cluster","ipFamilies":["IPv4"],"ipFamilyPolicy":"SingleStack","ports":[{"nodePort":31612,"port":80,"protocol":"TCP","targetPort":80}],"selector":{"app":"app1"},"sessionAffinity":"None","type":"NodePort"},"status":{"loadBalancer":{}}}
     creationTimestamp: "2025-03-03T07:33:24Z"
     labels:
       app: app1
       app.kubernetes.io/instance: nginx
     name: svc1
     namespace: default
-    resourceVersion: "23499"
+    resourceVersion: "23962"
     uid: a4cd0eef-50b5-4ffe-9724-4e40e7524a46
   spec:
     clusterIP: 10.43.233.251
