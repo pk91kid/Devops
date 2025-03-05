@@ -1,6 +1,9 @@
 import os
 import sys
 import time
+venv_path = "/venv/bin"
+if venv_path not in sys.path:
+    sys.path.insert(0, venv_path)
 import jenkins
 
 def get_jenkins_server(jenkins_url, auth):
