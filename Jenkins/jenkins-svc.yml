@@ -7,6 +7,6 @@ spec:
     app: jenkins
   ports:
     - protocol: TCP
-      port: 8081  # Expose Jenkins service on port 8081
-      targetPort: 8081  # The internal port that the Jenkins container is listening on
+      port: 8081  
+      targetPort: 8081  
   type: NodePort

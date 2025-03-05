@@ -22,3 +22,11 @@ spec:
           env:
             - name: JENKINS_OPTS
               value: "--httpPort=8081"
+          volumeMounts:
+            - mountPath: /var/jenkins_home
+              name: jenkins-home
+      volumes:
+        - name: jenkins-home
+          persistentVolumeClaim:
+            claimName: jenkins-pvc
+
