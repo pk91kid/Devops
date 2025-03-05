@@ -1,11 +1,11 @@
 FROM jenkins/jenkins:lts
 
-# Install Python 3 and pip
 USER root
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip && \
+    apt-get install -y python3 python3-pip python3-venv && \
     rm -rf /var/lib/apt/lists/*
-
-# Switch back to Jenkins user
+RUN python3 -m venv /venv
+RUN /venv/bin/pip install python-jenkins
 USER jenkins
+ENV PATH="/venv/bin:$PATH"
 
