@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+  namespace: python
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"    
+    deployment.kubernetes.io/revision: "v1"  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+        - name: python-app
+          image: pk91kid/python-app:v1
+          ports:
+            - containerPort: 5000
+      imagePullSecrets:
+        - name: regcred
+
