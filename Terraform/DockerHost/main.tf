@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "docker_host" {
-  source = "./modules"
+  source = "../modules"
 
   vpc_id     = "vpc-0f60ee96d2cbf3f41"
   subnet_id  = "subnet-0e1d1f660814ff3a8"
