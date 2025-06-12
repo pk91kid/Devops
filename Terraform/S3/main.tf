@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "s3_bucket" {
-  source            = "./modules"
+  source            = "../modules/s3"
   bucket_name       = var.bucket_name
   force_destroy     = var.force_destroy
   versioning_enabled = var.versioning_enabled
