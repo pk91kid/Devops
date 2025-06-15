@@ -1,13 +1,13 @@
 provider "aws" {
-  region = "ap-south-1"
+  region = "us-east-1"
 }
 
 module "docker_host" {
   source = "../modules/dockerhost"
 
-  vpc_id     = "vpc-0f60ee96d2cbf3f41"
-  subnet_id  = "subnet-0e1d1f660814ff3a8"
-  ami_id     = "ami-080270a5eef82c973"
+  vpc_id     = "vpc-0238c1e19117f994b"
+  subnet_id  = "subnet-0174ff4ac97ed3982"
+  ami_id     = "ami-02b3c03c6fadb6e2c"
   instance_type = "t2.micro"
   cidr_blocks = ["0.0.0.0/0"]
 }
