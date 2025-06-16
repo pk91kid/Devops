@@ -8,6 +8,13 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+      - name: Check bash availability
+        run: |
+          if command -v bash; then
+            echo "bash is available"
+          else
+            echo "bash is NOT available"
+          fi
       - name: Debug - check terraform access
         run: |
            id
