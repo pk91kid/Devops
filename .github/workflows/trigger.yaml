@@ -18,32 +18,41 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Terraform Init
-        working-directory: ./Terraform
-        run: terraform init -input=false
+      - name: Get changed Terraform directories
+        id: changed_dirs
+        run: |
+          echo "Detecting changed directories inside Terraform/"
+          # Get list of changed files in the PR
+          changed_files=$(jq -r '.pull_request.files[].filename' < $GITHUB_EVENT_PATH 2>/dev/null || git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          echo "Changed files: $changed_files"
 
-      - name: Terraform Plan
-        working-directory: ./Terraform
-        id: plan
-        run: terraform plan -input=false -no-color > plan.out
+          # Filter files under Terraform/
+          terraform_files=$(echo "$changed_files" | grep '^Terraform/')
 
-      - name: Save plan output
-        run: cat Terraform/plan.out
+          # Extract top-level changed subdirs inside Terraform
+          dirs=$(echo "$terraform_files" | cut -d/ -f1,2 | sort -u)
 
-      - name: Comment PR with plan output
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          header: terraform plan result
-          message: |
-            ```
-            ${{ steps.plan.outputs.stdout || steps.plan.outputs.plan }}
-            ```
-  
+          echo "Changed Terraform subdirectories:"
+          echo "$dirs"
+
+          echo "::set-output name=dirs::$dirs"
+
+      - name: Run Terraform commands in changed directories
+        run: |
+          for dir in ${{ steps.changed_dirs.outputs.dirs }}
+          do
+            echo "Running terraform init and plan in $dir"
+            cd "$dir"
+            terraform init -input=false
+            terraform plan -input=false -no-color > plan.out
+            cat plan.out
+            cd - >/dev/null
+          done
+
   terraform-apply:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: self-hosted
@@ -53,11 +62,23 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
-      - name: Terraform Init
-        working-directory: ./Terraform
-        run: terraform init -input=false
+      - name: Get changed Terraform directories from last commit
+        id: changed_dirs
+        run: |
+          echo "Detecting changed directories inside Terraform/"
+          changed_files=$(git diff --name-only HEAD~1 HEAD)
+          terraform_files=$(echo "$changed_files" | grep '^Terraform/')
+          dirs=$(echo "$terraform_files" | cut -d/ -f1,2 | sort -u)
+          echo "::set-output name=dirs::$dirs"
 
-      - name: Terraform Apply
-        working-directory: ./Terraform
-        run: terraform apply -input=false -auto-approve
+      - name: Run Terraform apply in changed directories
+        run: |
+          for dir in ${{ steps.changed_dirs.outputs.dirs }}
+          do
+            echo "Running terraform init and apply in $dir"
+            cd "$dir"
+            terraform init -input=false
+            terraform apply -input=false -auto-approve
+            cd - >/dev/null
+          done
 
