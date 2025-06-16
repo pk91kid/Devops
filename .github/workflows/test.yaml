@@ -8,25 +8,15 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - name: Debug runner environment minimal
+      - name: Install Terraform dynamically
         shell: bash
         run: |
-          echo "User: $USER"
-          echo "PATH: $PATH"
-          echo "Check terraform binary existence"
-          if [ -x /usr/local/bin/terraform ]; then
-            echo "Terraform binary found and executable"
-          else
-            echo "Terraform binary not found or not executable"
-          fi
-          echo "Run terraform version"
-          /usr/local/bin/terraform version || echo "Failed to run terraform version"
-      - name: Debug - check terraform access
-        run: |
-           id
-           ls -l /usr/local/bin/terraform
-           /usr/local/bin/terraform version
-        env:
-           PATH: /usr/local/bin:$PATH
+          TF_VERSION="1.9.7"
+          curl -Lo terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_arm64.zip
+          unzip terraform.zip
+          chmod +x terraform
+          mkdir -p $HOME/bin
+          mv terraform $HOME/bin/
+          echo "$HOME/bin" >> $GITHUB_PATH
       - name: Check tf version
         run: /usr/local/bin/terraform version
