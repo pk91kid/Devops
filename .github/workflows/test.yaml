@@ -4,7 +4,7 @@ on:
 jobs:
   Check-tf-version:
     name: Check tf version
-    runs-on: [self-hosted,docker-runner-latest]
+    runs-on: self-hosted
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
