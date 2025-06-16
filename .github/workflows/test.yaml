@@ -8,13 +8,19 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - name: Check bash availability
+      - name: Debug runner environment minimal
+        shell: bash
         run: |
-          if command -v bash; then
-            echo "bash is available"
+          echo "User: $USER"
+          echo "PATH: $PATH"
+          echo "Check terraform binary existence"
+          if [ -x /usr/local/bin/terraform ]; then
+            echo "Terraform binary found and executable"
           else
-            echo "bash is NOT available"
+            echo "Terraform binary not found or not executable"
           fi
+          echo "Run terraform version"
+          /usr/local/bin/terraform version || echo "Failed to run terraform version"
       - name: Debug - check terraform access
         run: |
            id
