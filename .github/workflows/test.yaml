@@ -2,7 +2,7 @@ name: Check terraform version
 on:
  workflow_dispatch:
 jobs:
-  Check tf version:
+  Check-tf-version:
     name: Check tf version
     runs-on: self-hosted
     steps:
