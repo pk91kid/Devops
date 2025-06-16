@@ -8,5 +8,12 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+      - name: Debug - check terraform access
+        run: |
+           id
+           ls -l /usr/local/bin/terraform
+           /usr/local/bin/terraform version
+        env:
+           PATH: /usr/local/bin:$PATH
       - name: Check tf version
         run: /usr/local/bin/terraform version
