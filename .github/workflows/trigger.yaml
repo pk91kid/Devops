@@ -26,14 +26,13 @@ jobs:
         with:
           terraform_version: 1.6.6
 
-      - name: Identify changed Terraform directories
-        id: find_dirs
+      - name:Find changed Terraform folders
+        id: changed_dirs
         run: |
           echo "Finding changed Terraform folders..."
-          changed_dirs=$(git diff --name-only origin/${{ github.base_ref }}...${{ github.head_ref }} | grep '^Terraform/' | awk -F/ '{print $2}' | sort -u)
+          changed_dirs=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} | grep '^Terraform/' | awk -F/ '{print $2}' | sort -u | uniq)
           echo "Changed directories:"
           echo "$changed_dirs"
-          echo "::set-output name=dirs::$changed_dirs"
           echo "CHANGED_DIRS=$changed_dirs" >> $GITHUB_ENV
 
       - name: Run Terraform plan for each folder
