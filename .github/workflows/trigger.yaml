@@ -1,83 +1,56 @@
-name: Terraform CI/CD
+name: Terraform PR Check
 
 on:
   pull_request:
-    branches:
-      - main
     paths:
       - 'Terraform/**'
-  pull_request_target:
-    types: [opened, synchronize, reopened]
-  push:
-    branches:
-      - main
 
 jobs:
   terraform-plan:
-    if: github.event_name == 'pull_request' && github.head_ref != 'main'
-    runs-on: self-hosted
+    name: Terraform Plan Check
+    runs-on: ubuntu-latest
+    if: github.event.pull_request # Ensures this only runs on PRs
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
 
-      - name: Get changed Terraform directories
-        id: changed_dirs
+      - name: Identify changed Terraform directories
+        id: find_dirs
         run: |
-          echo "Detecting changed directories inside Terraform/"
-          # Get list of changed files in the PR
-          changed_files=$(jq -r '.pull_request.files[].filename' < $GITHUB_EVENT_PATH 2>/dev/null || git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          echo "Changed files: $changed_files"
+          echo "Finding changed Terraform folders..."
+          changed_dirs=$(git diff --name-only origin/${{ github.base_ref }}...${{ github.head_ref }} | grep '^Terraform/' | awk -F/ '{print $2}' | sort -u)
+          echo "Changed directories:"
+          echo "$changed_dirs"
+          echo "::set-output name=dirs::$changed_dirs"
 
-          # Filter files under Terraform/
-          terraform_files=$(echo "$changed_files" | grep '^Terraform/')
-
-          # Extract top-level changed subdirs inside Terraform
-          dirs=$(echo "$terraform_files" | cut -d/ -f1,2 | sort -u)
-
-          echo "Changed Terraform subdirectories:"
-          echo "$dirs"
-
-          echo "::set-output name=dirs::$dirs"
-
-      - name: Run Terraform commands in changed directories
+      - name: Run Terraform plan for each folder
+        id: tf_plan
         run: |
-          for dir in ${{ steps.changed_dirs.outputs.dirs }}
-          do
-            echo "Running terraform init and plan in $dir"
-            cd "$dir"
+          result=""
+          for dir in ${{ steps.find_dirs.outputs.dirs }}; do
+            echo "Running terraform in Terraform/$dir"
+            cd Terraform/$dir
             terraform init -input=false
-            terraform plan -input=false -no-color > plan.out
-            cat plan.out
-            cd - >/dev/null
+            plan_output=$(terraform plan -no-color)
+            result+="## Terraform Plan for \`$dir\`\n\`\`\`\n$plan_output\n\`\`\`\n"
+            cd - > /dev/null
           done
+          echo "$result" > tf_plan_output.txt
+          echo "::set-output name=comment_body::$result"
 
-  terraform-apply:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-
-      - name: Get changed Terraform directories from last commit
-        id: changed_dirs
+      - name: Comment on PR with plan output
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Detecting changed directories inside Terraform/"
-          changed_files=$(git diff --name-only HEAD~1 HEAD)
-          terraform_files=$(echo "$changed_files" | grep '^Terraform/')
-          dirs=$(echo "$terraform_files" | cut -d/ -f1,2 | sort -u)
-          echo "::set-output name=dirs::$dirs"
-
-      - name: Run Terraform apply in changed directories
-        run: |
-          for dir in ${{ steps.changed_dirs.outputs.dirs }}
-          do
-            echo "Running terraform init and apply in $dir"
-            cd "$dir"
-            terraform init -input=false
-            terraform apply -input=false -auto-approve
-            cd - >/dev/null
-          done
+          comment=$(cat tf_plan_output.txt | jq -Rs .)
+          curl -s -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\": $comment}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
