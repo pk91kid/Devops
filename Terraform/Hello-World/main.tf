@@ -1,4 +1,4 @@
-#Hello-world!!!!!#####!
+#Hello-world!#
 terraform {
   required_providers {
     null = {
