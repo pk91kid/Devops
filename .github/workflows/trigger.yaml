@@ -4,11 +4,16 @@ on:
   pull_request:
     paths:
       - 'Terraform/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'Terraform/**'
 
 jobs:
   terraform-plan:
     name: Terraform Plan Check
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: github.event.pull_request
 
     steps:
@@ -70,3 +75,39 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"body\": $comment_body}" \
             "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments"
+
+  terraform-apply:
+    name: Terraform Apply (on PR merge only)
+    needs: terraform-plan
+    runs-on: self-hosted
+    if: github.event_name == 'push' && github.actor == 'web-flow'
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+      - name: Find changed Terraform folders
+        id: changed_dirs
+        run: |
+          echo "Finding changed Terraform folders..."
+          changed_dirs=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} \
+            | grep '^Terraform/' | awk -F/ '{print $2}' | sort -u | uniq)
+          echo "Changed directories:"
+          echo "$changed_dirs"
+          echo "CHANGED_DIRS=$changed_dirs" >> $GITHUB_ENV
+      - name: Terraform Apply
+        if: env.CHANGED_DIRS != ''
+        run: |
+          for dir in $CHANGED_DIRS; do
+            echo "Applying Terraform in Terraform/$dir"
+            cd Terraform/$dir
+            terraform init -input=false
+            terraform apply
+            cd - > /dev/null
