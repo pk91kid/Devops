@@ -59,10 +59,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          comment_body=$(jq -Rs . < tf_plan_output.txt)
+          echo -e "Hello @${PR_AUTHOR}, please have a look at the Terraform plan below:\n\n$(cat tf_plan_output.txt)" > tf_plan_output.txt
 
-          echo "Posting terraform plan comment to PR #$PR_NUMBER"
+          comment_body=$(jq -Rs . < tf_plan_output.txt)
 
           curl -s -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
