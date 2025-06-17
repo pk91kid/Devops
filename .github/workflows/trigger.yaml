@@ -26,7 +26,7 @@ jobs:
         with:
           terraform_version: 1.6.6
 
-      - name:Find changed Terraform folders
+      - name: Find changed Terraform folders
         id: changed_dirs
         run: |
           echo "Finding changed Terraform folders..."
