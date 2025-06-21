@@ -1,15 +1,29 @@
 provider "aws" {
   region = "us-east-1"
 }
+data "aws_vpc" "selected" {
+  id = var.vpc_id
+}
+data "aws_subnet" "mysubnet" {
+  vpc_id = data.aws_vpc.selected.id
+}
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
 
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
 module "docker_host" {
   source = "../modules/dockerhost"
 
-  vpc_id     = "vpc-0238c1e19117f994b"
-  subnet_id  = "subnet-0174ff4ac97ed3982"
-  ami_id     = "ami-02b3c03c6fadb6e2c"
-  instance_type = "t2.micro"
-  cidr_blocks = ["0.0.0.0/0"]
+  vpc_id        = var.vpc_id
+  subnet_id     = data.aws_subnet.mysubnet.id
+  ami_id        = data.aws_ami.amazon_linux.id
+  instance_type = var.instance_type
+  cidr_blocks   = var.cidr_blocks
 }
 output "docker_host_ip" {
   value = module.docker_host.docker_host_ip
