@@ -22,12 +22,13 @@ jobs:
 
      - name: Go to directory
        run: |
-          cd Terraform/{{ inputs.dir_name }}
+          cd Terraform/${{ inputs.dir_name }}
           terraform init
           terraform plan 
   terraform-apply:
     name: tf apply
     runs-on: self-hosted
+    needs: terraform-plan
     if: github.event.inputs.tf_apply == 'yes'
 
     steps:
@@ -36,7 +37,7 @@ jobs:
 
       - name: Go dir and apply
         run: |
-           cd Terraform/{{ inputs.dir_name }}
+           cd Terraform/${{ inputs.dir_name }}
            terraform init
            terraform plan
            terraform apply
