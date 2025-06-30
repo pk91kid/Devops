@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "Finding changed Terraform folders..."
           changed_dirs=$(git diff --name-only origin/${{ github.base_ref }}...origin/${{ github.head_ref }} \
-            | grep '^Terraform/' | awk -F/ '{print $2}' | sort -u | uniq)
+            | grep '^Terraform/' | awk -F/ '{print $2}' | sort -u | uniq | tr '\n' ',')
           echo "Changed directories:"
           echo "$changed_dirs"
           echo "CHANGED_DIRS=$changed_dirs" >> $GITHUB_ENV
