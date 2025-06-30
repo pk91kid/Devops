@@ -1,18 +1,3 @@
-#Hello-world!!#
-terraform {
-  required_providers {
-    null = {
-      source  = "hashicorp/null"
-      version = "~> 3.0"
-    }
-  }
+output test {
+  value       = "hello, how are you?"
 }
-
-provider "null" {}
-
-resource "null_resource" "hello" {
-  provisioner "local-exec" {
-    command = "echo hello-world"
-  }
-}
-
