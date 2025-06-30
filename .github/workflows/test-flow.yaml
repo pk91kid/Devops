@@ -30,7 +30,7 @@ jobs:
     name: tf apply
     runs-on: self-hosted
     needs: terraform-plan
-    if: github.event.inputs.tf_apply == 'yes'
+    if: inputs.tf_apply == 'yes'
 
     steps:
       - name: Checkout
