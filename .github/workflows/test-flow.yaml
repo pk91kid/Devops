@@ -9,6 +9,7 @@ on:
         description: terraform apply needed?
         required: true
         default: no
+        type: choice
         options:
          - yes
          - no
