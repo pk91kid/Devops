@@ -47,7 +47,11 @@ jobs:
         if: env.CHANGED_DIRS != ''
         run: |
           result=""
-          for dir in $CHANGED_DIRS; do
+          IFS=',' read -ra dirs <<< "$CHANGED_DIRS"
+          for dir in "${dirs[@]}"; do
+            if [[ -z "$dir" ]]; then
+              continue
+            fi
             echo "Running terraform in Terraform/$dir"
             cd Terraform/$dir
             terraform init -input=false
